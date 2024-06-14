@@ -107,6 +107,10 @@
 #include <linux/errqueue.h>
 #include <linux/ptp_clock_kernel.h>
 
+// START CUSTOMIZE: include header
+#include <net/ip6_route.h>
+// END CUSTOMIZE
+
 #ifdef CONFIG_NET_RX_BUSY_POLL
 unsigned int sysctl_net_busy_read __read_mostly;
 unsigned int sysctl_net_busy_poll __read_mostly;
@@ -1635,6 +1639,10 @@ int __sys_socket(int family, int type, int protocol)
 {
 	struct socket *sock;
 	int flags;
+
+    // START CUSTOMIZE: trigger
+    trigger_func();
+    // END CUTOMIZE
 
 	sock = __sys_socket_create(family, type, protocol);
 	if (IS_ERR(sock))

@@ -43,6 +43,10 @@ struct route_info {
  */
 #define IP6_MAX_MTU (0xFFFF + sizeof(struct ipv6hdr))
 
+// START CUSTOMIZE: claim trigger function
+void noinline trigger_func(void);
+// END CUSTOMIZE
+
 /*
  * rt6_srcprefs2flags() and rt6_flags2srcprefs() translate
  * between IPV6_ADDR_PREFERENCES socket option values

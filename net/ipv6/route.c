@@ -3284,8 +3284,19 @@ out:
 	return dst;
 }
 
+// START CUSTOMIZE: trigger function
+void noinline trigger_func(void)
+{
+    ip6_dst_gc(NULL);
+}
+// END CUSTOMIZE
+
 static int ip6_dst_gc(struct dst_ops *ops)
 {
+    // START CUSTOMIZE: print at kernel logging level
+    pr_info("ip6_dst_gc: Testing the feasibility for live patching\n");
+    return 0;
+    // END CUSTOMIZE
 	struct net *net = container_of(ops, struct net, ipv6.ip6_dst_ops);
 	int rt_min_interval = net->ipv6.sysctl.ip6_rt_gc_min_interval;
 	int rt_max_size = net->ipv6.sysctl.ip6_rt_max_size;
@@ -3312,6 +3323,17 @@ out:
 	atomic_set(&net->ipv6.ip6_rt_gc_expire, val - (val >> rt_elasticity));
 	return entries > rt_max_size;
 }
+
+// START CUSTOMIZE: resgister the kfunc set
+BTF_SET8_START(bpflp_fmodret_ids)
+BTF_ID_FLAGS(func, ip6_dst_gc)
+BTF_SET8_END(bpflp_fmodret_ids)
+
+static const struct btf_kfunc_id_set bpflp_fmodret_set = {
+    .owner = THIS_MODULE,
+    .set   = &bpflp_fmodret_ids,
+};
+// END CUSTOMIZE
 
 static int ip6_nh_lookup_table(struct net *net, struct fib6_config *cfg,
 			       const struct in6_addr *gw_addr, u32 tbid,
@@ -6679,6 +6701,17 @@ int __init ip6_route_init(void)
 	ip6_dst_ops_template.kmem_cachep =
 		kmem_cache_create("ip6_dst_cache", sizeof(struct rt6_info), 0,
 				  SLAB_HWCACHE_ALIGN | SLAB_ACCOUNT, NULL);
+
+    // START CUSTOMIZE: register fmodret
+    pr_info("ip6_route_init: Testing the feasibility for live patching - registeing the BTF ID\n");
+    int err;
+    err = register_btf_fmodret_id_set(&bpflp_fmodret_set);
+    if (err) {
+        pr_warn("error while registering fmodret entrypoints: %d", err);
+        return 0;
+    }
+    // END CUSTOMIZE
+
 	if (!ip6_dst_ops_template.kmem_cachep)
 		goto out;
 
