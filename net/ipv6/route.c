@@ -3291,7 +3291,7 @@ void noinline trigger_func(void)
 }
 // END CUSTOMIZE
 
-static int ip6_dst_gc(struct dst_ops *ops)
+static noinline int ip6_dst_gc(struct dst_ops *ops)
 {
     // START CUSTOMIZE: print at kernel logging level
     pr_info("ip6_dst_gc: Testing the feasibility for live patching\n");

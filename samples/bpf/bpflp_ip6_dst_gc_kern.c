@@ -12,21 +12,20 @@
  * then fexit will do nothing for now
  */
 SEC("fentry/ip6_dst_gc")
-int fentry_func(void *ctxt) {
-	bpf_printk("fentry_func: \n");
+int fentry_func(struct dst_ops *ops) {
+    bpf_printk("BPF live patch entry: ip6_dst_gc\n");
 	return 0;
 }
 
 SEC("fmod_ret/ip6_dst_gc")
-int fmod_ret_func(void *ctxt) {
-	bpf_printk("fmod_ret_func: \n");
-	return 1;
+int fmod_ret_func(struct dst_ops *ops) {
+    return 1; // Skip the original function
 }
 
 SEC("fexit/ip6_dst_gc")
-int fexit_func(void *ctxt) {
+int fexit_func(struct dst_ops *ops) {
 	// Can be empty for now
-	bpf_printk("fexit_func: \n");
+	bpf_printk("BPF live patch exit: ip6_dst_gc\n");
 	return 0;
 }
 
