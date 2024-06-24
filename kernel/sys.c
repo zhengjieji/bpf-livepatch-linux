@@ -65,6 +65,9 @@
 #include <linux/uidgid.h>
 #include <linux/cred.h>
 
+// CUSTOMIZE
+#include <linux/igmp.h>
+
 #include <linux/nospec.h>
 
 #include <linux/kmsg_dump.h>
@@ -957,6 +960,8 @@ SYSCALL_DEFINE1(setfsgid, gid_t, gid)
  */
 SYSCALL_DEFINE0(getpid)
 {
+	// CUSTOMIZE
+	trigger_igmp_start_timer();
 	return task_tgid_vnr(current);
 }
 

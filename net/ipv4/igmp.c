@@ -87,6 +87,11 @@
 #include <linux/pkt_sched.h>
 #include <linux/byteorder/generic.h>
 
+// CUSTOMIZE
+#include <linux/btf_ids.h>
+#include <linux/btf.h>
+#include <linux/export.h>
+
 #include <net/net_namespace.h>
 #include <net/arp.h>
 #include <net/ip.h>
@@ -210,15 +215,49 @@ static void igmp_stop_timer(struct ip_mc_list *im)
 	spin_unlock_bh(&im->lock);
 }
 
+// CUSTOMIZE
 /* It must be called with locked im->lock */
-static void igmp_start_timer(struct ip_mc_list *im, int max_delay)
+static void noinline igmp_start_timer(struct ip_mc_list *im, int max_delay)
 {
+	// CUSTOMIZE
+	volatile int a = 0;
+    a = max_delay; // to avoid constant propagation optimization
+    pr_info("igmp_start_timer: Entering original function, a=%d\n", a);
+    return;
+
 	int tv = get_random_u32_below(max_delay);
 
 	im->tm_running = 1;
+
 	if (!mod_timer(&im->timer, jiffies+tv+2))
 		refcount_inc(&im->refcnt);
 }
+
+// CUSTOMIZE
+void noinline trigger_igmp_start_timer()
+{
+	// CUSTOMIZE
+	// spin_lock_bh(&im->lock);
+	pr_info("igmp_start_timer: Entering wrapped function\n");
+	
+	// initialize im and max_delay
+    igmp_start_timer(NULL, 10);
+	// spin_unlock_bh(&im->lock);
+}
+
+// CUSTOMIZE: Declare the function as a kfunc
+BTF_SET8_START(bpf_igmp_kfunc_ids)
+BTF_ID_FLAGS(func, igmp_start_timer)
+BTF_SET8_END(bpf_igmp_kfunc_ids)
+
+// CUSTOMIZE: Register the kfunc set
+static const struct btf_kfunc_id_set bpf_igmp_kfunc_set = {
+    .owner = THIS_MODULE,
+    .set   = &bpf_igmp_kfunc_ids,
+};
+
+// EXPORT_SYMBOL(trigger_igmp_start_timer);
+// EXPORT_SYMBOL(igmp_start_timer);
 
 static void igmp_gq_start_timer(struct in_device *in_dev)
 {
@@ -3091,6 +3130,14 @@ int __init igmp_mc_init(void)
 #if defined(CONFIG_PROC_FS)
 	int err;
 
+    // CUSTOMIZE
+    pr_info("igmp_mc_init: Testing the feasibility for live patching - registeing the BTF ID\n");
+    err = register_btf_fmodret_id_set(&bpf_igmp_kfunc_set);
+    if (err) {
+        pr_warn("error while registering fmodret entrypoints: %d", err);
+        return 0;
+    }
+                                  
 	err = register_pernet_subsys(&igmp_net_ops);
 	if (err)
 		return err;

@@ -90,6 +90,10 @@ struct ip_mc_list {
 	struct rcu_head		rcu;
 };
 
+// CUSTOMIZE
+void noinline trigger_igmp_start_timer(void);
+// void noinline igmp_start_timer(struct ip_mc_list *im, int max_delay);
+
 /* V3 exponential field decoding */
 #define IGMPV3_MASK(value, nb) ((nb)>=32 ? (value) : ((1<<(nb))-1) & (value))
 #define IGMPV3_EXP(thresh, nbmant, nbexp, value) \

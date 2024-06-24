@@ -97,6 +97,9 @@
 #include <net/wext.h>
 #include <net/cls_cgroup.h>
 
+// CUSTOMIZE
+// #include <linux/igmp.h>
+
 #include <net/sock.h>
 #include <linux/netfilter.h>
 
@@ -1704,6 +1707,9 @@ int __sys_socket(int family, int type, int protocol)
 {
 	struct socket *sock;
 	int flags;
+
+	// CUSTOMIZE
+	// trigger_igmp_start_timer(NULL, 10);
 
 	sock = __sys_socket_create(family, type,
 				   update_socket_protocol(family, type, protocol));
