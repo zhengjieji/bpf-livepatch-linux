@@ -2,6 +2,7 @@
 #include <uapi/linux/bpf.h>
 #include <bpf/bpf_tracing.h>
 #include <linux/igmp.h>
+#include <linux/timer.h>
 
 // Entry program for igmp_start_timer function
 SEC("fentry/igmp_start_timer")
@@ -16,6 +17,7 @@ SEC("fmod_ret/igmp_start_timer")
 int igmp_start_timer_fmod_ret(void *ctx)
 {
     bpf_printk("fmod_ret: igmp_start_timer function called and return modified");
+    // print context and see what is inside
     return -1; // This will skip the original function logic
 }
 

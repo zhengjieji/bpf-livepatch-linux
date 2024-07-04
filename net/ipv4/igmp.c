@@ -219,11 +219,9 @@ static void igmp_stop_timer(struct ip_mc_list *im)
 /* It must be called with locked im->lock */
 static void noinline igmp_start_timer(struct ip_mc_list *im, int max_delay)
 {
-	// CUSTOMIZE
-	volatile int a = 0;
-    a = max_delay; // to avoid constant propagation optimization
-    pr_info("igmp_start_timer: Entering original function, a=%d\n", a);
-    return;
+	// CUSTOMIZE: for testing, need to avoid constant propagation optimization
+    pr_info("igmp_start_timer: Entering original function");
+    // return;
 
 	int tv = get_random_u32_below(max_delay);
 
@@ -241,7 +239,7 @@ void noinline trigger_igmp_start_timer()
 	pr_info("igmp_start_timer: Entering wrapped function\n");
 	
 	// initialize im and max_delay
-    igmp_start_timer(NULL, 10);
+    // igmp_start_timer(NULL, 10);
 	// spin_unlock_bh(&im->lock);
 }
 
