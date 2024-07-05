@@ -7,6 +7,7 @@ pound := \#
 
 # List of programs to build
 tprogs-y := test_lru_dist
+tprogs-y += bpflp_fw_set_parms_user
 tprogs-y += sock_example
 tprogs-y += fds_example
 tprogs-y += sockex1
@@ -121,6 +122,7 @@ xdp_router_ipv4-objs := xdp_router_ipv4_user.o $(XDP_SAMPLE)
 
 # Tell kbuild to always build the programs
 always-y := $(tprogs-y)
+always-y += bpflp_fw_set_parms_kern.o
 always-y += sockex1_kern.o
 always-y += sockex2_kern.o
 always-y += sockex3_kern.o

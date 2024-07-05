@@ -23,6 +23,12 @@
 #include <net/sch_generic.h>
 #include <net/tc_wrapper.h>
 
+// CUSTOMIZE
+#include <linux/btf_ids.h>
+#include <linux/btf.h>
+#include <linux/export.h>
+#include <net/dummy_fw.h>
+
 #define HTSIZE 256
 
 struct fw_head {
@@ -31,15 +37,15 @@ struct fw_head {
 	struct rcu_head		rcu;
 };
 
-struct fw_filter {
-	struct fw_filter __rcu	*next;
-	u32			id;
-	struct tcf_result	res;
-	int			ifindex;
-	struct tcf_exts		exts;
-	struct tcf_proto	*tp;
-	struct rcu_work		rwork;
-};
+// struct fw_filter {
+// 	struct fw_filter __rcu	*next;
+// 	u32			id;
+// 	struct tcf_result	res;
+// 	int			ifindex;
+// 	struct tcf_exts		exts;
+// 	struct tcf_proto	*tp;
+// 	struct rcu_work		rwork;
+// };
 
 static u32 fw_hash(u32 handle)
 {
@@ -235,6 +241,28 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
 
 	return 0;
 }
+
+// CUSTOMIZE: Create dummy fw_set_parms to be replaced
+int noinline __used __visible dummy_fw_set_parms(struct net *net, struct tcf_proto *tp,
+			struct fw_filter *f, struct nlattr **tb,
+			struct nlattr **tca, unsigned long base, u32 flags,
+			struct netlink_ext_ack *extack)
+{
+	pr_info("dummy_fw_set_parms: Entering dummy function \n");
+	// fw_set_parms(net, tp, f, tb, tca, base, flags, extack);	
+	return 0;
+}
+
+// CUSTOMIZE: Declare the function as a kfunc
+BTF_SET8_START(bpflp_kfunc_ids)
+BTF_ID_FLAGS(func, dummy_fw_set_parms)
+BTF_SET8_END(bpflp_kfunc_ids)
+
+// CUSTOMIZE: Register the kfunc set
+static const struct btf_kfunc_id_set bpflp_kfunc_set = {
+    .owner = THIS_MODULE,
+    .set   = &bpflp_kfunc_ids,
+};
 
 static int fw_change(struct net *net, struct sk_buff *in_skb,
 		     struct tcf_proto *tp, unsigned long base,
@@ -437,6 +465,15 @@ static struct tcf_proto_ops cls_fw_ops __read_mostly = {
 
 static int __init init_fw(void)
 {
+	// CUSTOMIZE
+	int err;
+    pr_info("init_fw: Registeing the BTF ID\n");
+    err = register_btf_fmodret_id_set(&bpflp_kfunc_set);
+    if (err) {
+        pr_warn("Error while registering fmodret entrypoints: %d", err);
+        return 0;
+    }
+	
 	return register_tcf_proto_ops(&cls_fw_ops);
 }
 
