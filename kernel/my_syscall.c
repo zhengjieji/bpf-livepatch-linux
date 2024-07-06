@@ -16,8 +16,23 @@ SYSCALL_DEFINE1(my_syscall, int, arg)
 
     int ret;
 
+    struct dummy_fw_set_parms_args *args = kmalloc(sizeof(struct dummy_fw_set_parms_args), GFP_KERNEL);
+    if (!args) {
+        pr_info("my_syscall: Error: kmalloc failed\n");
+        return -ENOMEM;
+    }
+
+    args->net = net;
+    args->tp = tp;
+    args->f = f;
+    args->tb = tb;
+    args->tca = tca;
+    args->base = base;
+    args->flags = flags;
+    args->extack = extack;
+
     pr_info("my_syscall: Calling dummy_fw_set_parms with arg=%d\n", arg);
-    ret = dummy_fw_set_parms(net, tp, f, tb, tca, base, flags, extack);
+    ret = dummy_fw_set_parms(args);
 
     return ret;
 }

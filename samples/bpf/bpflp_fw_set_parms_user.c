@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     prog_fexit = bpf_object__find_program_by_name(obj, "dummy_fw_set_parms_fexit");
     if (!prog_fexit) {
         fprintf(stderr, "Error: finding program 'dummy_fw_set_parms_fexit' in the object file failed\n");
-        goto cleanup;
+        goto cleanup; 
     }
 
     // Load the BPF object file

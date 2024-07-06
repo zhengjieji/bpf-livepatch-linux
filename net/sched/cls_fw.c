@@ -245,10 +245,7 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
 }
 
 // CUSTOMIZE: Create dummy fw_set_parms to be replaced
-int noinline __used __visible dummy_fw_set_parms(struct net *net, struct tcf_proto *tp,
-			struct fw_filter *f, struct nlattr **tb,
-			struct nlattr **tca, unsigned long base, u32 flags,
-			struct netlink_ext_ack *extack)
+int dummy_fw_set_parms(struct dummy_fw_set_parms_args *args)
 {
 	pr_info("dummy_fw_set_parms: Entering dummy function \n");
 	// fw_set_parms(net, tp, f, tb, tca, base, flags, extack);	

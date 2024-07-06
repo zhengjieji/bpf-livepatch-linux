@@ -2,9 +2,20 @@
 #ifndef _NET_DUMMY_FW_H
 #define _NET_DUMMY_FW_H
 
-#include <net/sch_generic.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/types.h>
+#include <linux/kernel.h>
+#include <linux/string.h>
+#include <linux/errno.h>
+#include <linux/skbuff.h>
+#include <net/netlink.h>
+#include <net/act_api.h>
 #include <net/pkt_cls.h>
+#include <net/sch_generic.h>
+#include <net/tc_wrapper.h>
 
+// CUSTOMIZE: Moved here
 struct fw_filter {
 	struct fw_filter __rcu	*next;
 	u32			id;
@@ -15,9 +26,18 @@ struct fw_filter {
 	struct rcu_work		rwork;
 };
 
-int noinline __used __visible dummy_fw_set_parms(struct net *net, struct tcf_proto *tp,
-                                struct fw_filter *f, struct nlattr **tb,
-                                struct nlattr **tca, unsigned long base, u32 flags,
-                                struct netlink_ext_ack *extack);
+// CUSTOMIZE: Create args for the function
+struct dummy_fw_set_parms_args {
+    struct net *net;
+    struct tcf_proto *tp;
+    struct fw_filter *f;
+    struct nlattr **tb;
+    struct nlattr **tca;
+    unsigned long base;
+    u32 flags;
+    struct netlink_ext_ack *extack;
+};
+
+int dummy_fw_set_parms(struct dummy_fw_set_parms_args *args);
 
 #endif /* _NET_DUMMY_FW_H */
