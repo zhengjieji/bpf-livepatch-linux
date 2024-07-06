@@ -37,6 +37,8 @@ struct fw_head {
 	struct rcu_head		rcu;
 };
 
+// CUSTOMIZE: moved to dummy_fw.h
+//
 // struct fw_filter {
 // 	struct fw_filter __rcu	*next;
 // 	u32			id;
