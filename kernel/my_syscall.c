@@ -10,8 +10,8 @@ SYSCALL_DEFINE1(my_syscall, int, arg)
     struct fw_filter *f = NULL;
     struct nlattr *tb[0];
     struct nlattr *tca[0];
-    unsigned long base = 0;
-    u32 flags = 0;
+    unsigned long base = 3;
+    u32 flags = 4;
     struct netlink_ext_ack *extack = NULL;
 
     int ret;

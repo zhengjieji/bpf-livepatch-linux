@@ -38,10 +38,10 @@ int dummy_fw_set_parms_fentry(void *ctx)
 
 // Modify the return value of the program
 SEC("fmod_ret/dummy_fw_set_parms")
-int dummy_fw_set_parms_fmod_ret(int a, int b, int ret)
+int dummy_fw_set_parms_fmod_ret(struct dummy_fw_set_parms_args *args, int ret)
 {
     // print args->base
-    // bpf_printk("fmod_ret: args->base: %lu\n", args->base);
+    bpf_printk("fmod_ret: flags: %u\n", args->flags);
     bpf_printk("fmod_ret: function called and return modified");
     return -1; // This will skip the original function logic
 }
