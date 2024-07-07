@@ -38,6 +38,9 @@ struct dummy_fw_set_parms_args {
     struct netlink_ext_ack *extack;
 };
 
-int dummy_fw_set_parms(struct dummy_fw_set_parms_args *args);
+// int dummy_fw_set_parms(struct dummy_fw_set_parms_args *args);
+int dummy_fw_set_parms(struct net *net, struct tcf_proto *tp,
+			struct fw_filter *f, unsigned long base, u32 flags,
+			struct netlink_ext_ack *extack);
 
 #endif /* _NET_DUMMY_FW_H */
