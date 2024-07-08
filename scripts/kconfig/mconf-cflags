@@ -1,0 +1,1 @@
+-D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600 -I/home/zhengjie/tools/homebrew/Cellar/ncurses/6.5/include/ncursesw -I/home/zhengjie/tools/homebrew/Cellar/ncurses/6.5/include
