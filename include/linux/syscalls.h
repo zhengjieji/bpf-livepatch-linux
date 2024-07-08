@@ -1227,6 +1227,9 @@ asmlinkage long sys_old_mmap(struct mmap_arg_struct __user *arg);
  */
 asmlinkage long sys_ni_syscall(void);
 
+// CUSTOMIZE: include/linux/syscalls.h
+asmlinkage long sys_my_syscall(int arg);
+
 #endif /* CONFIG_ARCH_HAS_SYSCALL_WRAPPER */
 
 
