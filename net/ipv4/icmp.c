@@ -94,6 +94,11 @@
 #include <net/l3mdev.h>
 #include <net/addrconf.h>
 
+// CUSTOMIZE
+#include <linux/btf_ids.h>
+#include <linux/btf.h>
+#include <linux/export.h>
+
 /*
  *	Build xmit assembly blocks
  */
@@ -269,6 +274,23 @@ bool icmp_global_allow(void)
 	return rc;
 }
 EXPORT_SYMBOL(icmp_global_allow);
+
+// CUSTOMIZE
+bool dummy_icmp_global_allow(void)
+{
+	return true;
+}
+
+// CUSTOMIZE: Declare the function as a kfunc
+BTF_SET8_START(bpflp_kfunc_ids)
+BTF_ID_FLAGS(func, dummy_icmp_global_allow)
+BTF_SET8_END(bpflp_kfunc_ids)
+
+// CUSTOMIZE: Register the kfunc set
+static const struct btf_kfunc_id_set bpflp_kfunc_set = {
+    .owner = THIS_MODULE,
+    .set   = &bpflp_kfunc_ids,
+};
 
 static bool icmpv4_mask_allow(struct net *net, int type, int code)
 {
@@ -1489,6 +1511,14 @@ static struct pernet_operations __net_initdata icmp_sk_ops = {
 int __init icmp_init(void)
 {
 	int err, i;
+
+	// CUSTOMIZE
+    pr_info("init_fw: Registeing the BTF ID\n");
+    err = register_btf_fmodret_id_set(&bpflp_kfunc_set);
+    if (err) {
+        pr_warn("Error while registering fmodret entrypoints: %d", err);
+        return 0;
+    }
 
 	for_each_possible_cpu(i) {
 		struct sock *sk;
