@@ -236,6 +236,7 @@ static struct {
  * Returns false if we reached the limit and can not send another packet.
  * Note: called with BH disabled
  */
+// CUSTOMIZE: revert this function to buggy v5.9 version
 bool icmp_global_allow(void)
 {
 	u32 credit, delta, incr = 0, now = (u32)jiffies;
@@ -254,17 +255,13 @@ bool icmp_global_allow(void)
 	spin_lock(&icmp_global.lock);
 	delta = min_t(u32, now - icmp_global.stamp, HZ);
 	if (delta >= HZ / 50) {
-		incr = READ_ONCE(sysctl_icmp_msgs_per_sec) * delta / HZ;
+		incr = sysctl_icmp_msgs_per_sec * delta / HZ ;
 		if (incr)
 			WRITE_ONCE(icmp_global.stamp, now);
 	}
-	credit = min_t(u32, icmp_global.credit + incr,
-		       READ_ONCE(sysctl_icmp_msgs_burst));
+	credit = min_t(u32, icmp_global.credit + incr, sysctl_icmp_msgs_burst);
 	if (credit) {
-		/* We want to use a credit of one in average, but need to randomize
-		 * it for security reasons.
-		 */
-		credit = max_t(int, credit - get_random_u32_below(3), 0);
+		credit--;
 		rc = true;
 	}
 	WRITE_ONCE(icmp_global.credit, credit);
