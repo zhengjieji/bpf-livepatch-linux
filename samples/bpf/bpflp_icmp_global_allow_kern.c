@@ -91,6 +91,7 @@ int BPF_PROG(dummy_icmp_global_allow_fmod_ret, bool ret)
 
     delta = min_t(u32, now - val->stamp, HZ);
     if (delta > HZ / 50) {
+        // CHECK: is this correct? maybe also use a bpf map
         incr = *klpe_sysctl_icmp_msgs_per_sec * delta / HZ;
         if (incr)
             val->stamp = now;
